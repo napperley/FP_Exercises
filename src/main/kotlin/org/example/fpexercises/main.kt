@@ -1,7 +1,7 @@
 package org.example.fpexercises
 
 fun main(args: Array<String>) {
-    doHigherOrderFunctions()
+    doRecursion()
 }
 
 @Suppress("ConvertLambdaToReference", "unused")
@@ -20,6 +20,7 @@ private fun doReduce() {
     println("Sum: $sum")
 }
 
+@Suppress("unused")
 private fun doHigherOrderFunctions() {
     val people = arrayOf(
             mapOf("name" to "Mary", "height" to 160),
@@ -34,4 +35,35 @@ private fun doHigherOrderFunctions() {
     val avgHeight = people.filter { "height" in it }.sumBy { it["height"] as Int } / people.count { "height" in it }
 
     println("Average Height: $avgHeight")
+}
+
+private fun doRecursion() {
+    fun zero(str: String): String {
+        var result = ""
+
+        if (str[0] == '0') result = str.slice(1..str.length - 1)
+        return result
+    }
+
+    fun one(str: String): String {
+        var result = ""
+
+        if (str[0] == '1') result = str.slice(1..str.length - 1)
+        return result
+    }
+
+    // Tail recursion occurs when a function calls itself, and some optimisations are done to prevent the stack from
+    // being overloaded (too many function calls). Note in Kotlin that tail recursion only works if the defined
+    // function returns itself in the last line of the block and the "tailrec" keyword is applied.
+    tailrec fun matchesRules(str: String, rules: List<(String) -> String>): Boolean {
+        if (rules.isEmpty()) return true
+        else if (rules[0](str).isEmpty()) return false
+        else return matchesRules(str.slice(1..str.length - 1), rules.slice(1..rules.size - 1))
+    }
+
+    val rules = listOf(::zero, ::one, ::one)
+    val str = "0111"
+
+    println("Matching rules zero one one to $str...")
+    println("Matches Rules: ${matchesRules(str, rules)}")
 }
