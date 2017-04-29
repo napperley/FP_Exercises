@@ -1,7 +1,9 @@
 package org.example.fpexercises
 
+typealias BandMap = Map<String, Any>
+
 fun main(args: Array<String>) {
-    doRecursion()
+    doFunctionCombo()
 }
 
 @Suppress("ConvertLambdaToReference", "unused")
@@ -37,6 +39,7 @@ private fun doHigherOrderFunctions() {
     println("Average Height: $avgHeight")
 }
 
+@Suppress("unused")
 private fun doRecursion() {
     fun zero(str: String): String {
         var result = ""
@@ -67,3 +70,50 @@ private fun doRecursion() {
     println("Matching rules zero one one to $str...")
     println("Matches Rules: ${matchesRules(str, rules)}")
 }
+
+private fun doFunctionCombo() {
+    fun changeCountryToCanada(band: BandMap): BandMap {
+        val result = band.toMutableMap()
+
+        result["country"] = "canada"
+        return result
+    }
+
+    fun stripPunctuationFromName(band: BandMap): BandMap {
+        val result = band.toMutableMap()
+
+        result["name"] = (result["name"] as String).replace(".", "")
+        return result
+    }
+
+    fun capitalizeNames(band: BandMap): BandMap {
+        val result = band.toMutableMap()
+
+        result["name"] = (result["name"] as String).toTitleCase()
+        return result
+    }
+
+    fun pipelineEach(bands: Array<BandMap>, functions: List<(BandMap) -> BandMap>): Array<BandMap> {
+        val result = bands
+
+        (0..bands.size - 1).forEach { pos ->
+            // Call each function to create the result.
+            functions.forEach { f -> result[pos] = f(result[pos]) }
+        }
+        return result
+    }
+
+    val bands = arrayOf(
+            mapOf("name" to "sunset rundown", "country" to "UK", "active" to false),
+            mapOf("name" to "zolnata", "country" to "Germany", "active" to false),
+            mapOf("name" to "a silver mt. zion", "country" to "Spain", "active" to true)
+    )
+    // Creates a List containing references to the changeCountryToCanada, stripPunctuationFromName, and capitalizeNames
+    // functions which will be invoked (called) later.
+    val functions = listOf(::changeCountryToCanada, ::stripPunctuationFromName, ::capitalizeNames)
+
+    pipelineEach(bands, functions).forEach { println("Band: $it") }
+}
+
+private fun String.toTitleCase(): String = split(' ').map { "${it[0].toUpperCase()}${it.slice(1..it.length - 1)}" }.
+        reduce { a, s -> "$a $s" }
